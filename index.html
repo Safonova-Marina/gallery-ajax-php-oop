@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="UTF-8">
+	<title>Gallery</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" class="href">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+<style>
+	.row {
+		margin-top: 20px;
+	}
+	.imgBlock {
+		min-height: 175px;
+	}
+</style>
+<body>
+	
+	<div class="container">
+		<div class="page-header bg-success text-center">
+			<h1>Галлерея</h1>
+		</div>
+
+		<div class="form-group text-danger col-sm-12" id="err_mes">
+			<p></p>
+		</div>
+
+		<form class="form-horizontal" name="form" id="form">
+
+			<div class="form-group">
+				<label for="inputFile" class="col-sm-2 control-label">Выберите файл (jpg, jpeg, png до 1 Мб):</label>
+				<div class="col-sm-4">
+					<input type="file" id="inputFile" name="inputFile">
+				</div>			
+			</div>
+
+			<div class="form-group">
+				<label for="inputComment" class="col-sm-2 control-label">Введите комментарий:</label>
+				<div class="col-sm-4">
+					<textarea class="form-control" id="inputComment" name="inputComment" maxlength="200" placeholder="Введите комментарий (максимум 200 символов)" cols="31" rows="7"></textarea>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-4">
+					<button type="button" class="btn btn-primary" name="inputSub" onclick="uploadImage()">Добавить изображение</button>
+				</div>
+			</div>
+
+			<div class="form-group" id="type_sort">
+				<label for="type_sort_sel" class="col-sm-1 control-label">Сортировать:</label>
+				<div class="col-sm-2">
+					<select class="form-control" id="type_sort_sel">
+						<option>Выберите метод сортировки</option>
+						<option value="dateSort">По дате загрузки</option>
+						<option value="weight">По размеру файла</option>
+					</select>
+				</div>
+				<label for="type_sort_order" class="col-sm-1 control-label">Порядок сортировки:</label>
+				<div class="col-sm-3">
+					<select class="form-control" id="type_sort_order">
+						<option value="1">По возрастанию</option>
+						<option value="-1">По убыванию</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group" id="type_sort">
+
+			</div>
+
+		</form>
+
+		<div class="content" id="content">
+		</div>
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$.ajax({
+					url: "app.php",
+					type: 'post',
+					data: {getAll: true},
+					success: function(res) {
+						var photoStart = JSON.parse(res);
+						// console.log(photoStart);
+						$.each(photoStart, function(){
+							createHtmlNewImage(this);
+						});
+					}//success
+				});//ajax
+			});//$(document).ready
+
+
+			var count = 0;
+			function uploadImage(){
+				var formData = new FormData($('#form')[0]);
+				$.ajax(
+				{
+					url: "app.php",
+					type: 'post',
+					processData: false,
+					contentType: false,
+					data: formData,
+					success: function(res) {
+						if (!res) $("#err_mes p").html("Загрузка не удалась: неверный формат файла или большой размер изображения. Допускается файл до 1 Мб разрешений jpg, jpeg, png");
+						else
+						{
+							$("#err_mes p").html("Файл успешно загружен");
+							$("#form")[0].reset();
+							var res_pars = JSON.parse(res);
+							createHtmlNewImage(res_pars);
+						}
+				}//success
+			});//ajax
+			}
+
+			function editImage(id, value)
+			{
+				var elem = $('#' + id).parent();
+				elem.find('span').hide();
+				elem.find('#edit').hide();
+				elem.find('#newCom').show();
+				elem.find('#newCom').find('button').click(function()
+				{
+					$.ajax({
+						url: "app.php",
+						type: 'post',
+						data: {id: id, newComment: elem.find('#newCom').find('textarea').val()},
+						success: function(res)
+						{
+							if (res)
+							{
+								elem.find('span').html(res).show();
+								elem.find('#edit').show();
+								elem.find('#newCom').hide();
+
+							}
+						}//success
+					});//ajax
+				})
+
+			}
+
+			function delImage(id)
+			{
+				$.ajax(
+				{
+					url: "app.php",
+					type: 'post',
+					data: {idDel: id},
+					success: function(res)
+					{
+						if (res)
+						{
+							var photoStart = JSON.parse(res);
+							$('#content').html('');
+							$.each(photoStart, function()
+							{
+								createHtmlNewImage(this);
+							});
+						}	
+					}//success
+				});//ajax
+			}//function delImage
+
+			$('#type_sort').change(function(){
+				var sort = $('#type_sort_sel').val();
+				var order = $('#type_sort_order').val();
+				sortGrid(sort, order);
+			});
+			
+
+			function sortGrid(param, order) {
+				if (param != 'Выберите метод сортировки')
+				{
+					var ar_sort = [];
+					var el = $('#content div.row').children('.col-md-3');
+					$.each(el, function()
+					{
+						ar_sort.push(this);
+					});
+					var compare = function(a, b) {
+						return $(a).find('#'+param).html() > $(b).find('#'+param).html() ? order : (-1)*order;
+					};
+					ar_sort.sort(compare);
+					$('#content').html('');
+					$.each(ar_sort, function()
+					{
+						var len = $('#content').children().last().children().length;
+						if (len%4 == 0) 
+							$('#content').append('<div class="row clearfix"></div>');
+
+						$('#content').children().last().append(this);
+					});
+				}
+			}
+
+			function createHtmlNewImage(res_pars){
+				var len = $('#content').children().last().children().length;
+				if (len%4 == 0) {
+					$('#content').append('<div class="row clearfix"></div>');
+				}
+
+				$('#content').children().last().append('<div class="col-md-3 col-sm-12 col-xs-12">' +
+					'<div class="card" id="' + res_pars['id'] + '">' +
+					'<div class="imgBlock"><img src="' + res_pars['path'] + '" class="img-rounded img-responsive"></div>' +
+					'<button type="button" id="del" class="btn btn-danger btn-xs center-block"  onclick="delImage(' + "'" + res_pars['id'] + "'" + ')">Удалить изображение</button>' +
+					'<p id="dateSort">' + res_pars['dateCreate'] + '</p>' +
+					'<button type="button" id="edit" class="btn btn-success" onclick="editImage(' + "'" + res_pars['id'] + "', 'tratatat<p>            ds    !'" + ')">&#9997;</button>' +
+					'<span>' + res_pars['comment'] + '</span>' +
+					'<div style="display: none;" id="newCom" >' +
+					'<textarea class="form-control" maxlength="200" placeholder="Введите комментарий (максимум 200 символов)" cols="31" rows="7">' + res_pars['comment'] + '</textarea>'+
+					
+					'<button type="button" class="btn btn-success btn-xs">Изменить</button>'+
+					'</div>' +
+					'<p class="hidden" id="weight">' + res_pars['weight'] + '</p>' + '</div></div>');
+			}//function createHtmlNewImage
+
+		</script>
+	</body>
+	</html>
