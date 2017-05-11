@@ -10,6 +10,9 @@
 	.row{
 		margin: 20px 0;
 	}
+	#pop{
+		margin-bottom: 15px;
+	}
 	.imgBlock {
 		min-height: 175px;
 	}
@@ -189,7 +192,7 @@
 							$("#form")[0].reset();
 							createHtmlNewImage(res['suc']);
 						}	
-						//else 	
+						setTimeout(function() { $("#err_mes p").html(''); }, 5000);
 						sortGrid(sort, order);				
 					}//success
 				});//ajax
