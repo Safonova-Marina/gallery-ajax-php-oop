@@ -7,8 +7,8 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </head>
 <style>
-	.row {
-		margin-top: 20px;
+	.row{
+		margin: 20px 0;
 	}
 	.imgBlock {
 		min-height: 175px;
@@ -25,31 +25,16 @@
 			<p></p>
 		</div>
 
-		<form class="form-horizontal" name="form" id="form">
+		<form class="form-horizontal">
 
-			<div class="form-group">
-				<label for="inputFile" class="col-sm-2 control-label">Выберите файл (jpg, jpeg, png до 1 Мб):</label>
-				<div class="col-sm-4">
-					<input type="file" id="inputFile" name="inputFile">
-				</div>			
-			</div>
-
-			<div class="form-group">
-				<label for="inputComment" class="col-sm-2 control-label">Введите комментарий:</label>
-				<div class="col-sm-4">
-					<textarea class="form-control" id="inputComment" name="inputComment" maxlength="200" placeholder="Введите комментарий (максимум 200 символов)" cols="31" rows="7"></textarea>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-4">
-					<button type="button" class="btn btn-primary" name="inputSub" onclick="uploadImage()">Добавить изображение</button>
-				</div>
-			</div>
+		<div id="pop">
+			<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#uploadPop">Загрузить изображение</button>
+			
+		</div>
 
 			<div class="form-group" id="type_sort">
-				<label for="type_sort_sel" class="col-sm-1 control-label">Сортировать:</label>
-				<div class="col-sm-2">
+				<label for="type_sort_sel" class="col-sm-2 control-label">Сортировать:</label>
+				<div class="col-sm-4">
 					<select class="form-control" id="type_sort_sel">
 						<option>Выберите метод сортировки</option>
 						<option value="dateSort">По дате загрузки</option>
@@ -64,17 +49,108 @@
 					</select>
 				</div>
 			</div>
-
-			<div class="form-group" id="type_sort">
-
-			</div>
-
 		</form>
-
+		
 		<div class="content" id="content">
 		</div>
 
+		<footer>
+		<!-- modal upload image -->
+			<div id="uploadPop" class="modal fade" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Выберите изображение</h4>
+						</div>
+						<div class="modal-body">
+							<form class="form-horizontal" name="form" id="form">
+								<div class="form-group">
+									<label for="inputFile" class="col-sm-4 control-label">Выберите файл (jpg, jpeg, png до 1 Мб):</label>
+									<div class="col-sm-6">
+										<input type="file" id="inputFile" name="inputFile">
+									</div>			
+								</div>
+
+								<div class="form-group">
+									<label for="inputComment" class="col-sm-4 control-label">Введите комментарий:</label>
+									<div class="col-sm-6">
+										<textarea class="form-control" id="inputComment" name="inputComment" maxlength="200" placeholder="Введите комментарий (максимум 200 символов)" cols="31" rows="7"></textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-sm-offset-2 col-sm-4">
+										<button type="button" class="btn btn-primary" name="inputSub" onclick="uploadImage()" data-dismiss="modal">Добавить изображение</button>
+									</div>
+								</div>
+							</form>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- modal to confirm delete -->
+			<div id="confirmDel" class="modal fade" role="dialog">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Подтвердите удаление</h4>
+						</div>
+						<div class="modal-body">
+							<form class="form-horizontal" name="form" id="form">
+								<div class="form-group">
+									<div class="col-sm-offset-2 col-sm-4">
+										<button type="button" class="btn btn-primary" name="delSub" onclick="delImage()" data-dismiss="modal">Удалить</button>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-sm-offset-2 col-sm-4">
+										<button type="button" class="btn btn-primary" name="delSub" data-dismiss="modal">Отменить</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- modal to edit comment -->
+			<div id="editCom" class="modal fade" role="dialog">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Напишите новый комментарий</h4>
+						</div>
+						<div class="modal-body">
+							<form class="form-horizontal" name="form" id="editComForm">
+
+								<textarea class="form-control" maxlength="200" placeholder="Введите комментарий (максимум 200 символов)" cols="31" rows="7"></textarea>
+
+								<div class="form-group">
+									<div class="col-sm-offset-2 col-sm-4">
+										<button type="button" class="btn btn-primary" name="editSub" onclick="editImage()" data-dismiss="modal">Изменить</button>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-sm-offset-2 col-sm-4">
+										<button type="button" class="btn btn-primary" name="editCan" data-dismiss="modal" onclick="editComFormReset()">Отменить</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+
 		<script type="text/javascript">
+			var idSel, idEdit;
 			$(document).ready(function() {
 				$.ajax({
 					url: "app.php",
@@ -82,7 +158,6 @@
 					data: {getAll: true},
 					success: function(res) {
 						var photoStart = JSON.parse(res);
-						// console.log(photoStart);
 						$.each(photoStart, function(){
 							createHtmlNewImage(this);
 						});
@@ -90,9 +165,10 @@
 				});//ajax
 			});//$(document).ready
 
-
 			var count = 0;
 			function uploadImage(){
+				var sort = $('#type_sort_sel').val();
+				var order = $('#type_sort_order').val();
 				var formData = new FormData($('#form')[0]);
 				$.ajax(
 				{
@@ -102,47 +178,65 @@
 					contentType: false,
 					data: formData,
 					success: function(res) {
-						if (!res) $("#err_mes p").html("Загрузка не удалась: неверный формат файла или большой размер изображения. Допускается файл до 1 Мб разрешений jpg, jpeg, png");
+						var res = JSON.parse(decodeURIComponent(res));
+						if(res['suc'] == null) 
+						{
+							$("#err_mes p").html(res['fail']);
+						}
 						else
 						{
 							$("#err_mes p").html("Файл успешно загружен");
 							$("#form")[0].reset();
-							var res_pars = JSON.parse(res);
-							createHtmlNewImage(res_pars);
-						}
-				}//success
-			});//ajax
+							createHtmlNewImage(res['suc']);
+						}	
+						//else 	
+						sortGrid(sort, order);				
+					}//success
+				});//ajax
 			}
 
-			function editImage(id, value)
+			function getEditImageID(id)
 			{
+				idEdit = id;
+				$('#editCom').find('textarea').html($('#' + id).parent().find('span').html());
+			}
+
+			function editComFormReset()
+			{
+				$('#editComForm')[0].reset();
+			}
+
+			function editImage()
+			{
+				var id = idEdit;
 				var elem = $('#' + id).parent();
-				elem.find('span').hide();
-				elem.find('#edit').hide();
-				elem.find('#newCom').show();
-				elem.find('#newCom').find('button').click(function()
-				{
-					$.ajax({
-						url: "app.php",
-						type: 'post',
-						data: {id: id, newComment: elem.find('#newCom').find('textarea').val()},
-						success: function(res)
+				var newValCom = $('#editCom').find('textarea').val();
+				$.ajax({
+					url: "app.php",
+					type: 'post',
+					data: {id: id, newComment: newValCom},
+					success: function(res)
+					{
+						if (res)
 						{
-							if (res)
-							{
-								elem.find('span').html(res).show();
-								elem.find('#edit').show();
-								elem.find('#newCom').hide();
-
-							}
-						}//success
-					});//ajax
-				})
-
+							elem.find('span').html(res);
+							$('#editComForm')[0].reset();
+						}
+					}//success
+				});//ajax
+				$('#editCom').find('textarea').html('');
 			}
 
-			function delImage(id)
+			function getIDSelectImage(id)
 			{
+				idSel = id;
+			}
+
+			function delImage()
+			{
+				var sort = $('#type_sort_sel').val();
+				var order = $('#type_sort_order').val();
+				var id = idSel;
 				$.ajax(
 				{
 					url: "app.php",
@@ -158,6 +252,7 @@
 							{
 								createHtmlNewImage(this);
 							});
+							sortGrid(sort, order);
 						}	
 					}//success
 				});//ajax
@@ -168,7 +263,6 @@
 				var order = $('#type_sort_order').val();
 				sortGrid(sort, order);
 			});
-			
 
 			function sortGrid(param, order) {
 				if (param != 'Выберите метод сортировки')
@@ -204,15 +298,11 @@
 				$('#content').children().last().append('<div class="col-md-3 col-sm-12 col-xs-12">' +
 					'<div class="card" id="' + res_pars['id'] + '">' +
 					'<div class="imgBlock"><img src="' + res_pars['path'] + '" class="img-rounded img-responsive"></div>' +
-					'<button type="button" id="del" class="btn btn-danger btn-xs center-block"  onclick="delImage(' + "'" + res_pars['id'] + "'" + ')">Удалить изображение</button>' +
+					'<button type="button" id="del" class="btn btn-danger btn-xs center-block" data-toggle="modal" data-target="#confirmDel" onclick="getIDSelectImage(' + "'" + res_pars['id'] + "'" + ')">Удалить изображение</button>' +
 					'<p id="dateSort">' + res_pars['dateCreate'] + '</p>' +
-					'<button type="button" id="edit" class="btn btn-success" onclick="editImage(' + "'" + res_pars['id'] + "', 'tratatat<p>            ds    !'" + ')">&#9997;</button>' +
+					'<button type="button" id="edit" class="btn btn-success" data-toggle="modal" data-target="#editCom" onclick="getEditImageID(' + "'" + res_pars['id'] + "'" + ')">&#9997;</button>' +
 					'<span>' + res_pars['comment'] + '</span>' +
 					'<div style="display: none;" id="newCom" >' +
-					'<textarea class="form-control" maxlength="200" placeholder="Введите комментарий (максимум 200 символов)" cols="31" rows="7">' + res_pars['comment'] + '</textarea>'+
-					
-					'<button type="button" class="btn btn-success btn-xs">Изменить</button>'+
-					'</div>' +
 					'<p class="hidden" id="weight">' + res_pars['weight'] + '</p>' + '</div></div>');
 			}//function createHtmlNewImage
 

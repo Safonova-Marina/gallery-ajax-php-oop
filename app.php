@@ -16,21 +16,27 @@ if (isset($_POST['getAll'])) {
 if (isset($_FILES['inputFile'])) {
 	$imgNew = new Image();
 	$a = $imgNew -> checkFile();
-	if ($a) {
+	$res = array();
+	if (strlen($a) <= 1) {
 		$imgNew -> saveFile();
 		$result = Collection::addNewImage($imgNew);
-		if (!$result)
-			return $result;
-		else
+		if ($result == true)
 		{
 			$imgNew->id = $result;
-			echo json_encode($imgNew);
-		}		
+			$res["suc"] = $imgNew;
+			$res["fail"] = false;
+		}	
+		else
+		{
+			return $result;
+		}	
 	}
 	else {
-		echo false;
 		unset($imgNew);
+		$res['fail'] = $a;
 	}
+	echo json_encode($res);;
+	
 }
 //код работает при загрузке файла
 
