@@ -24,13 +24,26 @@ class Image {
 				$max_image_size = 1000 * 1024;
 				$valid_types = array("jpg", "png", "jpeg");
 				$this -> ext = substr($_FILES['inputFile']['name'], 1 + strrpos($_FILES['inputFile']['name'], "."));
-				if (filesize($filename) < $max_image_size && in_array($this -> ext, $valid_types)) return true;
-				else return false;
+				// if (filesize($filename) < $max_image_size && in_array($this -> ext, $valid_types)) return true;
+				$resultMes = '';
+				if (filesize($filename) < $max_image_size)
+				{
+					if (in_array($this -> ext, $valid_types)) {
+						return true;
+					}
+					else $resultMes .= '2'; 
+				}
+				else $resultMes .= '4';
+				switch ($resultMes) {
+					case '2': return "Формат файла недопустим к загрузке. Допускается jpg, jpeg, png";break;
+					case '4': return"Слишком большой размер изображения. Допускается файл до 1 Мб"; break;
+					case '42': return "Загрузка не удалась: неверный формат файла и большой размер изображения. Допускается файл до 1 Мб разрешений jpg, jpeg, png"; break;
+					case '24': return "Загрузка не удалась: неверный формат файла и большой размер изображения. Допускается файл до 1 Мб разрешений jpg, jpeg, png"; break;
+				}
 			}
-			// else {return "Error: empty file.";}
+			else {return "Выберите изображение до 1 Мб разрешений jpg, jpeg, png";}
 		}
-		// else {return 'нет файла';}
-		return $res;
+		// return $this->fail = true;
 	}
 
 	public function saveFile() {
