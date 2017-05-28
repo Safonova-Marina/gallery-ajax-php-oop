@@ -2,12 +2,11 @@
 header('Content-Type: text/html; charset=utf-8');
 include('./connectDB-local.php');
 include('./classes/Collection.php');
-
 include('./classes/Image.php');
 
 //код работает при загрузке страницы - отдает все уже существующие картинки в галлерее
 if (isset($_POST['getAll'])) {
-	$gal = Collection::getAllImages();
+	$gal = Collection::getAllImages($_POST['sort'], $_POST['order'], $_POST['pageNum'], $_POST['size']);
 	echo json_encode($gal);
 }
 //код работает при загрузке страницы - отдает все уже существующие картинки в галлерее
@@ -23,7 +22,7 @@ if (isset($_FILES['inputFile'])) {
 		if ($result == true)
 		{
 			$imgNew->id = $result;
-			$res["suc"] = $imgNew;
+			$res["suc"] = true;
 			$res["fail"] = false;
 		}	
 		else
