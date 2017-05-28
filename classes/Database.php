@@ -17,9 +17,11 @@ class Database {
 		return $this->db;
 	}
 
-	public function getAllImagesDB()
+	public function getAllImagesDB($sort, $order, $pageNum, $limit, $size)
 	{
-		$query = 'SELECT * FROM images';
+		
+		$query = 'SELECT * FROM images ORDER BY '.$sort.' '.$order.' LIMIT '.$limit.','.$size;
+		// echo $query;
 		$result = $this->db->query($query);
 		while ($row = $result->fetch_assoc()) {
 			$allImages[] = $row;
@@ -51,6 +53,22 @@ class Database {
 		return $result;		
 	}
 
+	public function getCountImagesDB()
+	{
+		$query = 'SELECT id FROM images';
+		$result = $this->db->query($query)->num_rows;
+		return $result;		
+	}
+
+	// public function sortImagesDB($sort, $order)
+	// {
+	// 	$query = 'SELECT * FROM images ORDER BY '.$sort.' '.$order;
+	// 	$result = $this->db->query($query);
+	// 	while ($row = $result->fetch_assoc()) {
+	// 		$allImages[] = $row;
+	// 	}
+	// 	return $allImages;		
+	// }
 
 	function __destruct() {
 		$this->db->close();
