@@ -1,8 +1,4 @@
-﻿<?//print_r($_GET)
-
-
-?>
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <head>
 	<meta charset="UTF-8">
 	<title>Gallery</title>
@@ -234,6 +230,52 @@
 				getAllImagesParam();
 			});//$(document).ready
 
+			function setLocation()
+			{
+				var sort = $('#type_sort_sel').val();
+				var order = $('#type_sort_order').val();
+				var size = $('#pager-size').val();
+				var pageNum = $('#pager-list-hidden-id').val();
+
+				url = 'index.php?';
+				urlSort = "sort=" + sort + "&order=" + order;
+				urlPageSize = "&size=" + size;
+				urlPageNum = "&pageNum=" + pageNum;
+				locat = url + urlSort + urlPageNum + urlPageSize;
+
+				history.pushState("", "", locat);
+			}
+
+			//сортировка через запросы на сервер
+			function getAllImagesParam()
+			{
+				var sort = $('#type_sort_sel').val();
+				var order = $('#type_sort_order').val();
+				var size = $('#pager-size').val();
+				var pageNum = $('#pager-list-hidden-id').val();
+				$.ajax(
+				{
+					url: "collection/getAllImages",
+					type: 'post',
+					data: {sort:sort, order:order, pageNum:pageNum, size:size, getAll:true},
+					beforeSend: darkLoader,
+					success: function(res)
+					{
+						//console.log(res);
+						var photoStart = JSON.parse(res);
+						$('#content').html('');
+						$.each(photoStart.images, function(){
+							createHtmlNewImage(this);
+						});
+						$('#pager-list ul').html('').append(photoStart.pager);
+						urlPageNum = '&pageNum=' + photoStart.pageNum;
+						$('#pager-list-hidden-id').val(photoStart.pageNum);
+						setLocation();
+						$('#overlay').hide();
+					}//success
+				});//ajax
+			}
+
 			var count = 0;
 			function uploadImage(){
 				var sort = $('#type_sort_sel').val();
@@ -241,7 +283,7 @@
 				var formData = new FormData($('#form')[0]);
 				$.ajax(
 				{
-					url: "app.php",
+					url: "collection/addNewImage",
 					type: 'post',
 					processData: false,
 					contentType: false,
@@ -249,6 +291,7 @@
 					beforeSend: darkLoader,
 					success: function(res)
 					{
+						//console.log(res);
 						var res = JSON.parse(decodeURIComponent(res));
 						if(res['suc'] == null) 
 						{
@@ -284,7 +327,7 @@
 				var elem = $('#' + id).parent();
 				var newValCom = $('#editCom').find('textarea').val();
 				$.ajax({
-					url: "app.php",
+					url: "collection/editImage",
 					type: 'post',
 					data: {id: id, newComment: newValCom},
 					beforeSend: darkLoader,
@@ -313,7 +356,7 @@
 				var id = idSel;
 				$.ajax(
 				{
-					url: "app.php",
+					url: "collection/deleteImage",
 					type: 'post',
 					data: {idDel: id},
 					beforeSend: darkLoader,
@@ -327,51 +370,6 @@
 					}//success
 				});//ajax
 			}//function delImage
-
-			function setLocation()
-			{
-				var sort = $('#type_sort_sel').val();
-				var order = $('#type_sort_order').val();
-				var size = $('#pager-size').val();
-				var pageNum = $('#pager-list-hidden-id').val();
-
-				url = 'index.php?';
-				urlSort = "sort=" + sort + "&order=" + order;
-				urlPageSize = "&size=" + size;
-				urlPageNum = "&pageNum=" + pageNum;
-				locat = url + urlSort + urlPageNum + urlPageSize;
-
-				history.pushState("", "", locat);
-			}
-
-			//сортировка через запросы на сервер
-			function getAllImagesParam()
-			{
-				var sort = $('#type_sort_sel').val();
-				var order = $('#type_sort_order').val();
-				var size = $('#pager-size').val();
-				var pageNum = $('#pager-list-hidden-id').val();
-				$.ajax(
-				{
-					url: "app.php",
-					type: 'post',
-					data: {sort:sort, order:order, pageNum:pageNum, size:size, getAll:true},
-					beforeSend: darkLoader,
-					success: function(res)
-					{
-						var photoStart = JSON.parse(res);
-						$('#content').html('');
-						$.each(photoStart.images, function(){
-							createHtmlNewImage(this);
-						});
-						$('#pager-list ul').html('').append(photoStart.pager);
-						urlPageNum = '&pageNum=' + photoStart.pageNum;
-						$('#pager-list-hidden-id').val(photoStart.pageNum);
-						setLocation();
-						$('#overlay').hide();
-					}//success
-				});//ajax
-			}
 
 			function darkLoader() 
 			{
